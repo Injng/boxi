@@ -80,7 +80,7 @@ pub fn validate(expr: &str) -> bool {
 /// parses a string into a list of Tokens
 pub fn parse(expr: &str) -> Result<Vec<Token>, &str> {
     // first check if expression is valid
-    if !validate(expr) { return Err("Invalid expression"); }
+    if !validate(expr) { return Err("invalid expression"); }
 
     // separate the string into substrings, with each divided by an Operator
     let mut start = 0;
