@@ -181,7 +181,7 @@ pub fn parse(expr: &str) -> Result<Vec<Token>, &str> {
     // first check for matching parantheses
     if !check_parantheses(expr) { return Err("mismatched parantheses"); }
     // then, parse the expression into a list of Tokens
-    let tokens: Vec<Token> = tree(expr.trim(), Some(Vec::new()))?;
+    let tokens: Vec<Token> = tree(expr, Some(Vec::new()))?;
     Ok(tokens)
 }
 

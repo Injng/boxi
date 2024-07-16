@@ -1,30 +1,6 @@
 use crate::parser::{ Number, Operator, Paran, Token };
 
-/*
-struct Rosetta {
-    num: i64,
-}
-
-impl Rosetta {
-    fn init(num: i64) -> Rosetta {
-        return Rosetta { num };
-    }
-
-    fn to_binary(&self) -> String {
-        return format!("{:b}", self.num);
-    }
-
-    fn to_octal(&self) -> String {
-        return format!("{:o}", self.num);
-    }
-
-    fn to_hexadecimal(&self) -> String {
-        return format!("{:x}", self.num);
-    }
-}
-*/
-
-/// uses a shunting algorithm to convert a vector of tokens into postfix notation
+/// uses a shunting yard algorithm to convert a vector of tokens into postfix notation
 pub fn shunt(tokens: Vec<Token>) -> Vec<Token> {
     let mut output: Vec<Token> = Vec::new();
     let mut stack: Vec<Token> = Vec::new();
@@ -85,37 +61,33 @@ pub fn shunt(tokens: Vec<Token>) -> Vec<Token> {
     return output;
 }
 
-/*
-fn interpret(tokens: Vec<Token>) -> i64 {
+/// interpret a vector of tokens in postfix notation
+pub fn interpret(tokens: Vec<Token>) -> i64 {
     let mut stack: Vec<i64> = Vec::new();
     for token in tokens.iter() {
         match token {
-            Token::Number(Number::Binary(num)) => stack.push(*num),
-            Token::Number(Number::Octal(num)) => stack.push(*num),
-            Token::Number(Number::Decimal(num)) => stack.push(*num),
-            Token::Number(Number::Hexadecimal(num)) => stack.push(*num),
-            Token::Operator(Operator::Add) => {
-                let a = stack.pop().unwrap();
-                let b = stack.pop().unwrap();
-                stack.push(a + b);
+            Token::Number(num) => {
+                match num {
+                    Number::Binary(n) => stack.push(*n),
+                    Number::Octal(n) => stack.push(*n),
+                    Number::Decimal(n) => stack.push(*n),
+                    Number::Hexadecimal(n) => stack.push(*n),
+                }
             },
-            Token::Operator(Operator::Subtract) => {
-                let a = stack.pop().unwrap();
+            Token::Operator(op) => {
                 let b = stack.pop().unwrap();
-                stack.push(a - b);
-            },
-            Token::Operator(Operator::Multiply) => {
                 let a = stack.pop().unwrap();
-                let b = stack.pop().unwrap();
-                stack.push(a * b);
+                match op {
+                    Operator::Add => stack.push(a + b),
+                    Operator::Subtract => stack.push(a - b),
+                    Operator::Multiply => stack.push(a * b),
+                    Operator::Divide => stack.push(a / b),
+                }
             },
-            Token::Operator(Operator::Divide) => {
-                let a = stack.pop().unwrap();
-                let b = stack.pop().unwrap();
-                stack.push(a / b);
-            },
+            _ => (),
         }
     }
+
     return stack.pop().unwrap();
 }
-*/
+
