@@ -1,4 +1,5 @@
 pub mod parser;
+pub mod interpreter;
 
 use std::{env, process};
 use parser::{Token, parse};
