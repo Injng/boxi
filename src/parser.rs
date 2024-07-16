@@ -1,5 +1,5 @@
 /// represents a Number, which can be either binary, octal, decimal, or hex
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Number {
     Binary(i64),
     Octal(i64),
@@ -8,30 +8,50 @@ pub enum Number {
 }
 
 /// represents an Operator, which operates on two Numbers
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Operator {
     Add,
     Subtract,
     Multiply,
     Divide,
-    Open,
-    Close,
+}
+
+impl Operator {
+    /// returns the precedence of an Operator
+    pub fn precedence(&self) -> i32 {
+        match self {
+            Operator::Add => 1,
+            Operator::Subtract => 1,
+            Operator::Multiply => 2,
+            Operator::Divide => 2,
+        }
+    }
+
+    /// returns the associativity of an Operator, 0 for left, 1 for right
+    pub fn associativity(&self) -> i32 {
+        match self {
+            Operator::Add => 0,
+            Operator::Subtract => 0,
+            Operator::Multiply => 0,
+            Operator::Divide => 0,
+        }
+    }
 }
 
 /// represents a Paran, which can be either open or closed
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Paran {
     Open,
     Close,
 }
 
 /// represents a Token, which can be either a Number, Operator, Paran, or Function
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Number(Number),
     Operator(Operator),
     Paran(Paran),
-    Function,
+    // Function,
 }
 
 /// given a string, match it to an Operator or return None otherwise
@@ -117,18 +137,19 @@ pub fn tree(expr: &str, tokens: Option<Vec<Token>>) -> Result<Vec<Token>, &str> 
     // otherwise, continue matching for parantheses
     start = 0;
     end = 0;
+    let mut last_close = false;
     while end < expr.len() {
         if &expr[end..end+1] == "(" {
-            // if a number immediately precedes a parantheses, add implied multiplication
+            // if a number immediately precedes a parantheses, error
             let num = match_number(&expr[start..end]);
             if num.is_some() {
-                tokens.push(Token::Number(num.unwrap()));
-                tokens.push(Token::Operator(Operator::Multiply));
+                return Err("no implied multiplication 2");
             } else if start != end {
                 return Err("invalid expression");
             }
             tokens.push(Token::Paran(Paran::Open));
             start = end + 1;
+            last_close = false;
         } else if &expr[end..end+1] == ")" {
             let num = match_number(&expr[start..end]);
             if num.is_some() { tokens.push(Token::Number(num.unwrap())); }
@@ -137,13 +158,16 @@ pub fn tree(expr: &str, tokens: Option<Vec<Token>>) -> Result<Vec<Token>, &str> 
             }
             tokens.push(Token::Paran(Paran::Close));
             start = end + 1;
+            last_close = true;
         }
         end += 1;
     }
-    // check if the last substring is a valid Number, if so add implied multiplication
+
+    // check if the last substring is a valid Number
     let num = match_number(&expr[start..end]);
-    if num.is_some() {
-        tokens.push(Token::Operator(Operator::Multiply));
+    if num.is_some() && last_close {
+        return Err("no implied multiplication");
+    } else if num.is_some() {
         tokens.push(Token::Number(num.unwrap()));
     } else if start != end {
         return Err("invalid expression");

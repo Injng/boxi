@@ -3,6 +3,7 @@ pub mod interpreter;
 
 use std::{env, process};
 use parser::{Token, parse};
+use interpreter::shunt;
 
 fn error(msg: &str) {
     println!("boxi: {}", msg);
@@ -32,7 +33,13 @@ fn main() {
     if args[1] == "--help" { usage(); process::exit(0); }
     let tokens: Result<Vec<Token>, &str> = parse(&args[1]);
     if tokens.is_err() { error(tokens.as_ref().err().unwrap()); }
-    for token in tokens.unwrap().iter() {
+    /*
+    for token in tokens.clone().unwrap().iter() {
+        println!("normal: {:?}", token);
+    }
+    */
+    let shunted: Vec<Token> = shunt(tokens.unwrap());
+    for token in shunted.iter() {
         println!("{:?}", token);
     }
 }
