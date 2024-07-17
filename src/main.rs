@@ -45,7 +45,6 @@ fn main() {
             let mut input = String::new();
             stdin().read_line(&mut input).unwrap();
             input = input.trim().replace(" ", "");
-            println!("{}", input);
             if input == "exit" { break; }
             let tokens: Result<Vec<Token>, &str> = parse(&input);
             if tokens.is_err() { error(tokens.as_ref().err().unwrap()); continue; }
